@@ -1,0 +1,11 @@
+{
+  "nav": {
+    "fields": "Fields",
+    "goals": "Goals",
+    "tools": "Tools",
+    "trending": "Trending",
+    "prompts": "Prompts",
+    "guides": "Guides",
+    "search": "Search"
+  }
+}

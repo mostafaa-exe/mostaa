@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PricingType {
+  FREE
+  FREEMIUM
+  PAID
+}
+
+enum PlatformType {
+  WEB
+  CHROME
+  DISCORD
+  API
+  MOBILE
+}
+
+model Field {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  titleAr     String
+  titleEn     String
+  description String
+  tools       Tool[]
+  goals       Goal[]
+  prompts     Prompt[]
+  views       Int      @default(0)
+  saves       Int      @default(0)
+  usageScore  Float    @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Goal {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  titleAr     String
+  titleEn     String
+  summary     String
+  fields      Field[]
+  tools       Tool[]
+  prompts     Prompt[]
+  workflow    GoalWorkflowStep[]
+  views       Int                @default(0)
+  saves       Int                @default(0)
+  usageScore  Float              @default(0)
+  createdAt   DateTime           @default(now())
+}
+
+model Tool {
+  id             String             @id @default(cuid())
+  slug           String             @unique
+  name           String
+  descriptionAr  String
+  descriptionEn  String
+  pricing        PricingType
+  supportsArabic Boolean            @default(false)
+  websiteUrl     String
+  platform       PlatformType
+  fields         Field[]
+  goals          Goal[]
+  prompts        Prompt[]
+  workflowSteps  GoalWorkflowStep[]
+  tags           Tag[]
+  views          Int                @default(0)
+  saves          Int                @default(0)
+  usageScore     Float              @default(0)
+  createdAt      DateTime           @default(now())
+}
+
+model Prompt {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  titleAr     String
+  titleEn     String
+  contentAr   String
+  contentEn   String
+  tools       Tool[]
+  fields      Field[]
+  goals       Goal[]
+  tags        Tag[]
+  workflowFor GoalWorkflowStep[]
+  views       Int                @default(0)
+  saves       Int                @default(0)
+  usageScore  Float              @default(0)
+  createdAt   DateTime           @default(now())
+}
+
+model GoalWorkflowStep {
+  id            String  @id @default(cuid())
+  goalId        String
+  stepOrder     Int
+  titleAr       String
+  titleEn       String
+  instructions  String
+  toolId        String
+  promptId      String
+  alternatives  String[]
+
+  goal   Goal   @relation(fields: [goalId], references: [id])
+  tool   Tool   @relation(fields: [toolId], references: [id])
+  prompt Prompt @relation(fields: [promptId], references: [id])
+
+  @@unique([goalId, stepOrder])
+}
+
+model Tag {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  tools   Tool[]
+  prompts Prompt[]
+}
+
+model Submission {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  description String
+  url         String?
+  email       String?
+  createdAt   DateTime @default(now())
+}
